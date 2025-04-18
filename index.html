@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Giải Mã Bức Tranh</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      position: relative;
+      display: grid;
+      border: 2px solid #ccc;
+    }
+
+    .tile {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+    }
+
+    .tile.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .cover {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      z-index: 2;
+      transition: opacity 0.3s;
+    }
+
+    .tile.flipped .cover {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tile .number {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: white;
+      padding: 5px;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 3;
+    }
+
+    .tile.flipped .number {
+      display: none;
+    }
+
+    .tile img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      object-position: top left;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      backface-visibility: hidden;
+    }
+
+    .tile .back {
+      transform: rotateY(180deg);
+      backface-visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+  <h1>Giải Mã Bức Tranh</h1>
+  <div class="grid" id="puzzleGrid"></div>
+
+  <script>
+    const grid = document.getElementById("puzzleGrid");
+    const rows = 5;
+    const cols = 5;
+    const imageURL = "./image.jpg"; 
+    let tileNumber = 1;
+
+    const img = new Image();
+    img.src = imageURL;
+    img.onload = function() {
+      const imageWidth = img.width;
+      const imageHeight = img.height;
+
+      const tileSizeX = imageWidth / cols;
+      const tileSizeY = imageHeight / rows;
+
+      grid.style.gridTemplateColumns = `repeat(${cols}, ${tileSizeX}px)`;
+      grid.style.gridTemplateRows = `repeat(${rows}, ${tileSizeY}px)`;
+      grid.style.width = `${tileSizeX * cols}px`;
+      grid.style.height = `${tileSizeY * rows}px`;
+
+      for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+          const tile = document.createElement("div");
+          tile.classList.add("tile");
+          
+          const imgTile = document.createElement("img");
+          imgTile.src = imageURL;
+          imgTile.style.left = `-${col * tileSizeX}px`;
+          imgTile.style.top = `-${row * tileSizeY}px`;   
+          imgTile.style.width = `${imageWidth}px`;
+          imgTile.style.height = `${imageHeight}px`;
+          tile.appendChild(imgTile);
+
+          const number = document.createElement("div");
+          number.classList.add("number");
+          number.textContent = tileNumber;
+          tile.appendChild(number);
+
+          const cover = document.createElement("div");
+          cover.classList.add("cover");
+          tile.appendChild(cover);
+
+          const back = document.createElement("div");
+          back.classList.add("back");
+          tile.appendChild(back);
+
+          const backImage = document.createElement("img");
+          backImage.src = imageURL;
+          backImage.style.left = `-${col * tileSizeX}px`;
+          backImage.style.top = `-${row * tileSizeY}px`;
+          backImage.style.width = `${imageWidth}px`;
+          backImage.style.height = `${imageHeight}px`;
+          back.appendChild(backImage);
+
+          tile.addEventListener("click", () => {
+            tile.classList.add("flipped");
+          });
+
+          grid.appendChild(tile);
+
+          tileNumber++; 
+        }
+      }
+    }
+  </script>
+</body>
+</html>
